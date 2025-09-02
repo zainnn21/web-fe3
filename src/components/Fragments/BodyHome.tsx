@@ -2,11 +2,14 @@ import WideCard from "../Elements/WideCard/Index";
 import Title from "../Elements/TitleForm/Title";
 import Paragraph from "../Elements/TitleForm/Paragraph";
 import CategoryTabs from "../Elements/List/index";
-import Data from "../../data/cardClass";
+// import Data from "../../data/cardClass";
 import Card from "../Elements/Card/index";
 import Button from "../Elements/Button";
 import Input from "../Elements/Input/Input";
 import TitleCollectionVideo from "../Elements/Card/titlecollectionvideo";
+import { useEffect, useState } from "react";
+import { getProduct } from "../../services/api/product.service";
+import type { Product } from "../../services/api/product.service";
 
 const HeroSection = () => (
   <WideCard variant="topcard">
@@ -30,17 +33,27 @@ const HeroSection = () => (
   </WideCard>
 );
 
-const CourseSection = () => (
-  <div className="flex flex-col md:gap-8 gap-6 md:w-300 w-80">
-    <TitleCollectionVideo />
-    <CategoryTabs />
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {Data.slice(0, 9).map((item) => (
-        <Card key={item.id} {...item} />
-      ))}
+const CourseSection = () => {
+  const [product, setProduct] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getProduct((data) => {
+      console.log(data);
+      setProduct(data);
+    });
+  }, []);
+
+  return (
+    <div className="flex flex-col md:gap-8 gap-6 md:w-300 w-80">
+      <TitleCollectionVideo />
+      <CategoryTabs />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {product.length > 0 &&
+          product.slice(0, 9).map((item) => <Card key={item.id} {...item} />)}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const NewsletterSection = () => (
   <WideCard variant="lowercard">

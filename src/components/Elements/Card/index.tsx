@@ -12,11 +12,28 @@ type CardProps = {
   profilename: string;
   job: string;
   jobspan: string;
-  ratingImages?: string[];
-  ratingdesc?: string;
-  price: string | number;
+  ratingImages?: number;
+  price:  number;
   className?: string;
+  reviewcount?: number;
 };
+
+  const formatPrice = (price: number) => {
+    //Format million
+    if (price >= 1000000) {
+      const num = (price / 1000000).toFixed(1);
+      if (num.endsWith(".0")) {
+        return `Rp ${Math.floor(price / 1000000)}M`;
+      }
+      return `Rp ${num}M`;
+    }
+    //Format thousand
+    if (price >= 1000) {
+      return `Rp ${Math.floor(price / 1000)}K`;
+    }
+
+    return `Rp` + price;
+  };
 
 const Card = ({
   source,
@@ -27,21 +44,23 @@ const Card = ({
   job,
   jobspan,
   ratingImages,
-  ratingdesc,
   price,
   className = "",
+  reviewcount,
 }: CardProps) => {
+
+  
   return (
     <div
       className={`md:w-96 rounded-[10px] bg-white border md:p-5 p-4 flex flex-col md:gap-4 gap-2  border-[#3A35411F] ${className} hover:shadow-lg cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out `}
     >
       <div className="flex gap-3 md:flex-col">
-        <ImageCard source={source}></ImageCard>
+        <ImageCard source={source} />
         <div className="flex flex-col gap-2">
           <CardTitle name="titlecard">{texttitle}</CardTitle>
           <ParagraphCard name="pcard">{ptitle}</ParagraphCard>
           <div className="flex gap-2.5">
-            <Profile srcprofile={srcprofile} name="profile"></Profile>
+            <Profile srcprofile={srcprofile} name="profile" />
             <div>
               <CardTitle name="profile">{profilename}</CardTitle>
               <ParagraphCard name="pprofile">
@@ -56,13 +75,13 @@ const Card = ({
       </div>
       <div className="flex justify-between items-center gap-2">
         <div className="flex gap-2">
-          <Stars images={ratingImages || []}></Stars>
+          <Stars rating={ratingImages || 0} />
           <p className="font-medium text-xs md:text-sm leading-[140%] tracking-[0.2px] text-[#333333AD] underline">
-            {ratingdesc}
+            {ratingImages} <span>{"(" + reviewcount + ")"}</span>
           </p>
         </div>
         <p className="font-poppins text-[#3ECF4C] font-semibold text-xl md:text-2xl leading-[120%]">
-          {price}
+          {formatPrice(price)}
         </p>
       </div>
     </div>

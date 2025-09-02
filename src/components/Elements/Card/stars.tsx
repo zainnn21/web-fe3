@@ -1,12 +1,31 @@
+import RatingFull from "../../../assets/Star.png";
+import RatingEmpty from "../../../assets/gray Star.png";
+import RatingHalf from "../../../assets/Masked Star.png";
+
 type StarsProps = {
-  images: string[];
+  rating: number;
 };
 
-const Stars = ({ images }: StarsProps) => {
-  // Default ke array kosong untuk mencegah error
+const generateStars = (rating: number, totalStars = 5) => {
+  const images = [];
+  
+  for (let i = 1; i <= totalStars; i++) {
+    if (i <= rating) {
+      images.push(RatingFull);
+    } else if (i - 0.5 <= rating) {
+      images.push(RatingHalf);
+    } else {
+      images.push(RatingEmpty);
+    }
+  }
+  return images;
+};
+
+const Stars = ({ rating }: StarsProps) => {
+  const ratingImages = generateStars(rating);
   return (
     <div className="flex gap-0.5">
-      {images.map((image, index) => (
+      {ratingImages.map((image, index) => (
         <img
           key={index}
           src={image}

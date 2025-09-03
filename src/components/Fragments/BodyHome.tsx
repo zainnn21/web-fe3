@@ -2,7 +2,6 @@ import WideCard from "../Elements/WideCard/Index";
 import Title from "../Elements/TitleForm/Title";
 import Paragraph from "../Elements/TitleForm/Paragraph";
 import CategoryTabs from "../Elements/List/index";
-// import Data from "../../data/cardClass";
 import Card from "../Elements/Card/index";
 import Button from "../Elements/Button";
 import Input from "../Elements/Input/Input";

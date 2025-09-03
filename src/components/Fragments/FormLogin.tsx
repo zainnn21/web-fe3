@@ -3,34 +3,25 @@ import Button from "../Elements/Button/index";
 import LineOr from "../Elements/LineOr/index";
 import FormTitle from "../Elements/TitleForm/index";
 import { Link, useNavigate } from "react-router-dom";
+import { postUser } from "../../services/api/auth.service";
+
 const FormLogin = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const userProfile = localStorage.getItem("profileData");
-
-    if (userProfile === null) {
-      alert("Profile Tidak Ditemukan");
-      return;
+    const data = {
+      email: event.target.email.value,
+      password: event.target.password.value,
     }
 
-    const userData = JSON.parse(userProfile);
-    const emailInput = event.target.email.value;
-    const passwordInput = event.target.password.value;
-    console.log(emailInput, passwordInput);
-    console.log(userData);
-    console.log(userData.email);
+    postUser(data);
 
-    if (emailInput !== userData.email || passwordInput !== userData.password) {
-      alert("Email atau password salah");
-      return;
-    }
-
-    alert("Login berhasil");
-    console.log("clicked");
-    userData.isLogin = true;
-    localStorage.setItem("profileData", JSON.stringify(userData));
+    const userLocalStorage = {
+      isLogin: false,
+      token: "",
+    };
+    localStorage.setItem("userLocalStorage", JSON.stringify(userLocalStorage));
     navigate("/");
   };
   return (

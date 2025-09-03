@@ -5,6 +5,7 @@ import FormTitle from "../Elements/TitleForm";
 import OptionGender from "../Elements/OptionGender/Index";
 import { Link, useNavigate } from "react-router-dom";
 import NoHp from "../Elements/NoHp/index";
+import { postUser } from "../../services/api/auth.service";
 
 const FormRegister = () => {
   const navigate = useNavigate();
@@ -12,23 +13,22 @@ const FormRegister = () => {
   //simpan data user di local storage
   const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("clicked");
     const userData = {
-      namaLengkap: event.target.namalengkap.value,
+      name: event.target.namalengkap.value,
       email: event.target.email.value,
-      jenisKelamin: event.target.jeniskelamin.value,
-      noHp: event.target.nohp.value,
+      gender: event.target.jeniskelamin.value,
+      phone: event.target.nohp.value,
       password: event.target.password.value,
       countryCode: event.target.countryCode.value,
       konfirmasiPassword: event.target.konfirmasipassword.value,
-      isLogin: false,
+      createdAt: new Date(),
     };
 
     if (
-      !userData.namaLengkap ||
+      !userData.name ||
       !userData.email ||
-      !userData.jenisKelamin ||
-      !userData.noHp ||
+      !userData.gender ||
+      !userData.phone ||
       !userData.password ||
       !userData.konfirmasiPassword ||
       !userData.countryCode
@@ -42,21 +42,22 @@ const FormRegister = () => {
       return;
     }
 
-    if (userData.noHp.length < 8) {
+    if (userData.phone.length < 8) {
       alert("No Hp minimal 8 angka !!!");
       return;
     }
 
-    if (userData.noHp.length > 15) {
+    if (userData.phone.length > 15) {
       alert("No Hp maksimal 15 angka !!!");
       return;
     }
 
-    if (!userData.noHp.match(/^\d+$/)) {
+    if (!userData.phone.match(/^\d+$/)) {
       alert("No Hp harus angka !!!");
       return;
     }
-    localStorage.setItem("profileData", JSON.stringify(userData));
+
+    postUser(userData);
     navigate("/login");
   };
 

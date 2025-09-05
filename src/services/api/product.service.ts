@@ -1,18 +1,5 @@
 import axios from "axios";
-
-export interface Product {
-  id: number;
-  source: string;
-  category: string;
-  ptitle: string;
-  srcprofile: string;
-  profilename: string;
-  job: string;
-  jobspan: string;
-  price: string;
-  texttitle: string;
-  duration: string;
-}
+import type { Product } from "../types/product";
 
 export const getProduct = (callback: (data: Product[]) => void) => {
   axios

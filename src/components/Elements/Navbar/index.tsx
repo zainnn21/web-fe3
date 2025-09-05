@@ -8,18 +8,16 @@ import Line3 from "../../../assets/3line.png";
 const Navbar = () => {
   // 1. Dapatkan path URL saat ini dengan hook `useLocation` dari React Router.
   const { pathname } = useLocation();
-  const getUserData = JSON.parse(localStorage.getItem("profileData") || "{}");
+  const getUserLogin = JSON.parse(localStorage.getItem("isLogin") || "false");
 
-  // 2. Simulasi status login.
-  // Di real aplikasi, nilai ini akan datang dari state management (seperti Context API atau Redux).
-  const isLoggedIn = getUserData.isLogin;
+  const userLogin = getUserLogin;
+  console.log(userLogin);
 
   // Kondisi untuk mengecek apakah kita berada di halaman login atau register
   const isAuthPage = pathname === "/login" || pathname === "/register";
 
   const categoryVariant = pathname === "/all-product" ? "!text-[#3ECF4C]" : "";
   const adminVariant = pathname === "/admin" ? "!text-[#3ECF4C]" : "";
-
 
   return (
     <>
@@ -28,7 +26,7 @@ const Navbar = () => {
         <div className="flex gap-4 md:gap-8">
           {!isAuthPage && (
             <>
-              {isLoggedIn && (
+              {userLogin && (
                 <Category To="/admin" variant={adminVariant}>
                   Admin
                 </Category>
@@ -45,7 +43,7 @@ const Navbar = () => {
       {/* Tampilkan bagian ini (profile atau tombol login) hanya jika BUKAN halaman login atau register */}
       {!isAuthPage && (
         <>
-          {isLoggedIn ? (
+          {userLogin ? (
             // JIKA PENGGUNA SUDAH LOGIN: Tampilkan ikon profil.
             <div className="flex items-center">
               <div className="hidden md:block">

@@ -5,7 +5,7 @@ import FormTitle from "../Elements/TitleForm";
 import OptionGender from "../Elements/OptionGender/Index";
 import { Link, useNavigate } from "react-router-dom";
 import NoHp from "../Elements/NoHp/index";
-import { postUser } from "../../services/api/auth.service";
+import { registerUser } from "../../services/api/auth.service";
 
 const FormRegister = () => {
   const navigate = useNavigate();
@@ -13,8 +13,8 @@ const FormRegister = () => {
   //simpan data user di local storage
   const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const userData = {
-      name: event.target.namalengkap.value,
+    const inputUser = {
+      name: event.target.namalenkap.value,
       email: event.target.email.value,
       gender: event.target.jeniskelamin.value,
       phone: event.target.nohp.value,
@@ -22,42 +22,45 @@ const FormRegister = () => {
       countryCode: event.target.countryCode.value,
       konfirmasiPassword: event.target.konfirmasipassword.value,
       createdAt: new Date(),
+      updatedAt: new Date(),
+      id: Math.random().toString(36),
     };
 
     if (
-      !userData.name ||
-      !userData.email ||
-      !userData.gender ||
-      !userData.phone ||
-      !userData.password ||
-      !userData.konfirmasiPassword ||
-      !userData.countryCode
+      !inputUser.name ||
+      !inputUser.email ||
+      !inputUser.gender ||
+      !inputUser.phone ||
+      !inputUser.password ||
+      !inputUser.konfirmasiPassword ||
+      !inputUser.countryCode
     ) {
       alert("Semua field harus diisi !!!");
       return;
     }
 
-    if (userData.password !== userData.konfirmasiPassword) {
+    if (inputUser.password !== inputUser.konfirmasiPassword) {
       alert("Password tidak sama !!!");
       return;
     }
 
-    if (userData.phone.length < 8) {
+    if (inputUser.phone.length < 8) {
       alert("No Hp minimal 8 angka !!!");
       return;
     }
 
-    if (userData.phone.length > 15) {
+    if (inputUser.phone.length > 15) {
       alert("No Hp maksimal 15 angka !!!");
       return;
     }
 
-    if (!userData.phone.match(/^\d+$/)) {
+    if (!inputUser.phone.match(/^\d+$/)) {
       alert("No Hp harus angka !!!");
       return;
     }
 
-    postUser(userData);
+    registerUser(inputUser);
+    console.log(inputUser);
     navigate("/login");
   };
 
@@ -71,7 +74,7 @@ const FormRegister = () => {
       <form className="gap-3 flex flex-col" onSubmit={handleSubmit}>
         <InputForm
           label="Nama Lengkap"
-          name="namalengkap"
+          name="namalenkap"
           placeholder=""
           type="text"
         ></InputForm>

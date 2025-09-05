@@ -14,12 +14,12 @@ const Profile = ({ srcprofile, variant }: ProfileProps) => {
   const handleLogout = () => {
     const confirmLogout = window.confirm("Apakah Anda yakin ingin keluar?");
     if (confirmLogout) {
-      const profileData = JSON.parse(
-        localStorage.getItem("profileData") || "{}"
-      );
-      if (profileData) {
-        profileData.isLogin = false;
-        localStorage.setItem("profileData", JSON.stringify(profileData));
+      const isLogin = JSON.parse(localStorage.getItem("isLogin") || "{}");
+      if (isLogin) {
+        localStorage.removeItem("isLogin");
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        window.location.href = "/";
       }
     }
   };

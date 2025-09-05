@@ -2,7 +2,7 @@ import { useId } from "react";
 
 type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
-  value?: string;
+  value?: number | string;
   placeHolder?: string;
 };
 

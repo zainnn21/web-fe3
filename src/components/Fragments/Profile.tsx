@@ -4,32 +4,39 @@ import NavigationButton from "../Elements/MyProfile/NavigationButton";
 import MyProfileForm from "../Elements/MyProfile/myprofileform";
 import Button from "../Elements/Button";
 import CountryCode from "../Elements/MyProfile/countrycode";
-import { useState } from "react";
-
-interface ProfileData {
-  namaLengkap?: string;
-  email?: string;
-  password?: string;
-  countryCode?: string;
-  noHp?: string;
-}
+import { useEffect, useState } from "react";
+import { updateUser, getUserById } from "../../services/api/auth.service";
+import type { User } from "../../services/types/auth";
 
 const Profile = () => {
-  const getInitialState = (): ProfileData => {
-    try {
-      return JSON.parse(localStorage.getItem("profileData") || "{}");
-    } catch (error) {
-      console.error("Gagal mem-parsing data profil dari localStorage", error);
-      return {};
-    }
-  };
-  const [profile, setProfile] = useState<ProfileData>(getInitialState());
+  const [profile, setProfile] = useState<User | undefined>(undefined);
+  const localSorageId = localStorage.getItem("user");
+  const id = localSorageId ? JSON.parse(localSorageId).id : "";
+  useEffect(() => {
+    const getInitialState = async () => {
+      if (!id) {
+        console.log("ID Tidak Ditemukan");
+        return;
+      }
+      try {
+        const response = await getUserById(id);
+        setProfile(response);
+      } catch (error) {
+        console.log(`Gagal mengambil data user ID: ${id}`, error);
+        throw error;
+      }
+    };
+    getInitialState();
+  }, [id]);
 
   const handleFieldChange = (name: string, value: string) => {
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      [name]: value,
-    }));
+    setProfile((prevProfile) => {
+      if (!prevProfile) return;
+      return {
+        ...prevProfile,
+        [name]: value,
+      };
+    });
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) =>
@@ -39,12 +46,25 @@ const Profile = () => {
     event: React.ChangeEvent<HTMLSelectElement>
   ) => handleFieldChange("countryCode", event.target.value);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    localStorage.setItem("profileData", JSON.stringify(profile));
-    alert("Data berhasil diubah");
-    window.location.reload();
+    if (!profile) return;
+
+    try {
+      if (profile.phone && isNaN(profile.phone)) {
+        alert("No Hp hanya bisa diisi dengan angka");
+        return;
+      }
+      updateUser(id, profile);
+      localStorage.setItem("user", JSON.stringify(profile));
+      alert("Data berhasil diubah");
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+      alert("Terjadi kesalahan");
+    }
   };
+
   return (
     <main className="px-5 py-7 gap-6 flex flex-col md:flex-row md:px-30 md:py-16 md:gap-9 md:justify-center">
       <div className="flex flex-col gap-6">
@@ -78,43 +98,43 @@ const Profile = () => {
         <MyProfile
           imgSrc="/myprofile.png"
           imgAlt="profile"
-          name={getInitialState().namaLengkap ?? ""}
-          email={getInitialState().email ?? ""}
+          name={profile?.name ?? ""}
+          email={profile?.email ?? ""}
           button="Ganti Foto Profil"
         />
 
         <div className="flex flex-col gap-4 md:flex-row">
           <MyProfileForm
             label="Nama Lengkap"
-            name="namaLengkap"
-            value={profile.namaLengkap ?? ""}
+            name="name"
+            value={profile?.name ?? ""}
             onChange={handleInputChange}
           />
           <MyProfileForm
             label="E-Mail"
             name="email"
             type="email"
-            value={profile.email ?? ""}
+            value={profile?.email ?? ""}
             onChange={handleInputChange}
           />
           <MyProfileForm
             label="Password"
             name="password"
             type="password"
-            value={profile.password ?? ""}
+            value={profile?.password ?? ""}
             onChange={handleInputChange}
           />
         </div>
         <div className="flex flex-col gap-4 md:flex-row">
           <CountryCode
-            countryCode={profile.countryCode ?? ""}
+            countryCode={profile?.countryCode ?? ""}
             onChange={handleCountryCodeChange}
           />
           <MyProfileForm
             label=""
-            name="noHp"
+            name="phone"
             type="tel"
-            value={profile.noHp ?? ""}
+            value={profile?.phone ?? Number(0)}
             onChange={handleInputChange}
           />
         </div>

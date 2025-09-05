@@ -1,3 +1,4 @@
+import type { Product } from "../../services/types/product";
 import WideCard from "../Elements/WideCard/Index";
 import Title from "../Elements/TitleForm/Title";
 import Paragraph from "../Elements/TitleForm/Paragraph";
@@ -8,7 +9,6 @@ import Input from "../Elements/Input/Input";
 import TitleCollectionVideo from "../Elements/Card/titlecollectionvideo";
 import { useEffect, useState } from "react";
 import { getProduct } from "../../services/api/product.service";
-import type { Product } from "../../services/api/product.service";
 
 const HeroSection = () => (
   <WideCard variant="topcard">

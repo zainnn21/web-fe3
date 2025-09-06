@@ -5,14 +5,21 @@ import MyProfileForm from "../Elements/MyProfile/myprofileform";
 import Button from "../Elements/Button";
 import CountryCode from "../Elements/MyProfile/countrycode";
 import { useEffect, useState } from "react";
-import { updateUser, getUserById } from "../../services/api/auth.service";
+import {
+  updateUser,
+  getUserById,
+  deleteUser,
+} from "../../services/api/auth.service";
 import type { User } from "../../services/types/auth";
 
 const Profile = () => {
   const [profile, setProfile] = useState<User | undefined>(undefined);
   const localSorageId = localStorage.getItem("user");
   const id = localSorageId ? JSON.parse(localSorageId).id : "";
+
   useEffect(() => {
+    //jika user belum login
+    if(localStorage.getItem("isLogin") === null) window.location.href = "/";
     const getInitialState = async () => {
       if (!id) {
         console.log("ID Tidak Ditemukan");
@@ -58,10 +65,28 @@ const Profile = () => {
       updateUser(id, profile);
       localStorage.setItem("user", JSON.stringify(profile));
       alert("Data berhasil diubah");
-      window.location.reload();
     } catch (error) {
       console.log(error);
       alert("Terjadi kesalahan");
+    }
+  };
+
+  const handleDeleteAccount = () => {
+    if (profile) {
+      try {
+        if (!confirm("Apakah anda yakin ingin menghapus akun?")) return;
+        console.log(id);
+        deleteUser(id);
+        localStorage.removeItem("user");
+        localStorage.removeItem("isLogin");
+        localStorage.removeItem("token");
+        alert("Akun berhasil dihapus");
+        if (window.location.pathname === "/my-profile")
+          window.location.href = "/";
+      } catch (error) {
+        console.log(error);
+        alert("Terjadi kesalahan");
+      }
     }
   };
 
@@ -139,7 +164,14 @@ const Profile = () => {
           />
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-4">
+          <Button
+            label="Delete Account"
+            typeButton="button"
+            bg="bg-red-500"
+            textColor="text-white md:w-[140px]"
+            onClick={handleDeleteAccount}
+          ></Button>
           <Button
             label="Simpan"
             typeButton="submit"

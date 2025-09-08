@@ -50,7 +50,7 @@ export const updateUser = async (id: string, data: User) => {
 
 export const deleteUser = async (id: string) => {
   const response = await apiClient.delete(`${API_Users}/${id}`);
-  console.log(`User ID: ${id} berhasil dihapus: `);
+  console.log(`User ID: ${id} berhasil dihapus`);
   console.log("Server response: ", response);
   return response.data;
 };

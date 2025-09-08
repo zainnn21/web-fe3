@@ -49,7 +49,8 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         alert("No Hp hanya bisa diisi dengan angka");
         return;
       }
-      updateUser(id, profile);
+
+      await updateUser(id, profile);
       localStorage.setItem("user", JSON.stringify(profile));
       alert("Data berhasil diubah");
     } catch (error) {
@@ -63,7 +64,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     try {
       if (!confirm("Apakah anda yakin ingin menghapus akun?")) return;
       console.log(id);
-      deleteUser(id);
+      await deleteUser(id);
       localStorage.removeItem("user");
       localStorage.removeItem("isLogin");
       localStorage.removeItem("token");

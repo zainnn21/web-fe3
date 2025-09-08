@@ -1,4 +1,3 @@
-import type { Product } from "../../services/types/product";
 import WideCard from "../Elements/WideCard/Index";
 import Title from "../Elements/TitleForm/Title";
 import Paragraph from "../Elements/TitleForm/Paragraph";
@@ -7,8 +6,9 @@ import Card from "../Elements/Card/index";
 import Button from "../Elements/Button";
 import Input from "../Elements/Input/Input";
 import TitleCollectionVideo from "../Elements/Card/titlecollectionvideo";
-import { useEffect, useState } from "react";
 import { getProduct } from "../../services/api/product.service";
+import { useState, useEffect } from "react";
+import type { Product } from "../../services/types/product";
 
 const HeroSection = () => (
   <WideCard variant="topcard">
@@ -34,12 +34,16 @@ const HeroSection = () => (
 
 const CourseSection = () => {
   const [product, setProduct] = useState<Product[]>([]);
-
   useEffect(() => {
-    getProduct((data) => {
-      console.log(data);
-      setProduct(data);
-    });
+    const fetchProdoct = async () => {
+      try {
+        const response = await getProduct();
+        setProduct(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchProdoct();
   }, []);
 
   return (
@@ -48,7 +52,9 @@ const CourseSection = () => {
       <CategoryTabs />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {product.length > 0 &&
-          product.slice(0, 9).map((item) => <Card key={item.id} {...item} />)}
+          product
+            .slice(0, 9)
+            .map((item: Product) => <Card key={item.id} {...item} />)}
       </div>
     </div>
   );

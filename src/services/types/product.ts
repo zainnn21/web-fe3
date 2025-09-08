@@ -11,3 +11,8 @@ export interface Product {
   texttitle: string;
   duration: string;
 }
+
+export interface limitOption {
+  limit?: number;
+  page?: number;
+}

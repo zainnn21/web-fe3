@@ -80,10 +80,12 @@ const Admin = () => {
       return;
     }
 
-    if (formData.price === 0) {
+    if (formData.price.toLocaleString() === "0") {
       confirm("Apakah anda yakin harga course 0 (gratis)?");
     }
-    
+
+    console.log("Form Data Submitted: ", formData);
+
     // Generate ID
     const newId =
       courses.length > 0

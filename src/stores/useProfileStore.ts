@@ -55,26 +55,25 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     } catch (error) {
       console.log(error);
       set({ error: "Gagal memperbarui data user" });
+      alert("Gagal memperbarui data user");
     }
   },
 
   deleteProfile: async (id: string) => {
-    const { profile } = get();
-    if (profile) {
-      try {
-        if (!confirm("Apakah anda yakin ingin menghapus akun?")) return;
-        console.log(id);
-        deleteUser(id);
-        localStorage.removeItem("user");
-        localStorage.removeItem("isLogin");
-        localStorage.removeItem("token");
-        alert("Akun berhasil dihapus");
-        if (window.location.pathname === "/my-profile")
-          window.location.href = "/";
-      } catch (error) {
-        console.log(error);
-        alert("Terjadi kesalahan");
-      }
+    try {
+      if (!confirm("Apakah anda yakin ingin menghapus akun?")) return;
+      console.log(id);
+      deleteUser(id);
+      localStorage.removeItem("user");
+      localStorage.removeItem("isLogin");
+      localStorage.removeItem("token");
+      alert("Akun berhasil dihapus");
+      if (window.location.pathname === "/my-profile")
+        window.location.href = "/";
+    } catch (error) {
+      console.log(error);
+      set({ error: "Gagal menghapus data user" });
+      alert("Gagal menghapus data user");
     }
   },
 }));

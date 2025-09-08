@@ -5,7 +5,7 @@ import Eyeon from "../../../assets/mdi_eye-on.png";
 type InputProps = {
   name?: string;
   placeholder: string;
-  type: string;
+  type: string ;
   variant?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string | number;

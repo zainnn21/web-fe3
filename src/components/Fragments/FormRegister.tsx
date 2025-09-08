@@ -5,64 +5,11 @@ import FormTitle from "../Elements/TitleForm";
 import OptionGender from "../Elements/OptionGender/Index";
 import { Link, useNavigate } from "react-router-dom";
 import NoHp from "../Elements/NoHp/index";
-import { registerUser } from "../../services/api/auth.service";
+import { useRegister } from "../../hooks/useRegister";
 
 const FormRegister = () => {
   const navigate = useNavigate();
-
-  //simpan data user di local storage
-  const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const inputUser = {
-      name: event.target.namalenkap.value,
-      email: event.target.email.value,
-      gender: event.target.jeniskelamin.value,
-      phone: event.target.nohp.value,
-      password: event.target.password.value,
-      countryCode: event.target.countryCode.value,
-      konfirmasiPassword: event.target.konfirmasipassword.value,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      id: Math.random().toString(36),
-    };
-
-    if (
-      !inputUser.name ||
-      !inputUser.email ||
-      !inputUser.gender ||
-      !inputUser.phone ||
-      !inputUser.password ||
-      !inputUser.konfirmasiPassword ||
-      !inputUser.countryCode
-    ) {
-      alert("Semua field harus diisi !!!");
-      return;
-    }
-
-    if (inputUser.password !== inputUser.konfirmasiPassword) {
-      alert("Password tidak sama !!!");
-      return;
-    }
-
-    if (inputUser.phone.length < 8) {
-      alert("No Hp minimal 8 angka !!!");
-      return;
-    }
-
-    if (inputUser.phone.length > 15) {
-      alert("No Hp maksimal 15 angka !!!");
-      return;
-    }
-
-    if (!inputUser.phone.match(/^\d+$/)) {
-      alert("No Hp harus angka !!!");
-      return;
-    }
-
-    registerUser(inputUser);
-    console.log(inputUser);
-    navigate("/login");
-  };
+  const handleSubmit = useRegister();
 
   return (
     <>
@@ -84,10 +31,10 @@ const FormRegister = () => {
           placeholder=""
           type="email"
         ></InputForm>
-        <OptionGender label="Jenis Kelamin " name="jeniskelamin"></OptionGender>
+        <OptionGender label="Jenis Kelamin " name="gender"></OptionGender>
         <NoHp
           label="No. Hp "
-          name="nohp"
+          name="phone"
           placeholder=""
           type="tel"
           countryCode="countryCode"

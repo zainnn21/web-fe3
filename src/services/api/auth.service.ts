@@ -8,7 +8,6 @@ const API_Users = `/users`;
 export const registerUser = async (data: User) => {
   try {
     const response = await axios.post(`${API_URL}${API_Users}`, data);
-    console.log("Data User: ", response);
     return response.data;
   } catch (error) {
     console.log(error);

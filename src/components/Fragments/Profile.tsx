@@ -16,11 +16,12 @@ const Profile = () => {
   useEffect(() => {
     //jika user belum login
     if (localStorage.getItem("isLogin") === null) window.location.href = "/";
+
     if (!id) {
       console.log("ID Tidak Ditemukan");
       return;
     }
-
+    
     fetchProfile(id);
     console.log("ID User:", id);
   }, [fetchProfile, id]);
@@ -34,8 +35,9 @@ const Profile = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!profile) return;
-    updateProfile(id);
+    if (profile) {
+      updateProfile(id);
+    }
   };
 
   const handleDeleteAccount = () => {

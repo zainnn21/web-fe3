@@ -1,23 +1,18 @@
-import axios from "axios";
+import apiClient from "../apiClient";
 import type { User, UserLogin } from "../types/auth";
 
-const API_URL = "https://68b67b2873b3ec66cec1a8fa.mockapi.io";
 const API_Users = `/users`;
 
 //register user
 export const registerUser = async (data: User) => {
-  try {
-    const response = await axios.post(`${API_URL}${API_Users}`, data);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
+  const response = await apiClient.post(API_Users, data);
+  return response.data;
 };
 
 //login user
 export const loginUser = async (data: UserLogin) => {
-  const response = await axios.get(`${API_URL}/users?email=${data.email}`);
+  const response = await apiClient.get(`${API_Users}?email=${data.email}`);
+  console.log("Response Login: ", response);
 
   //mengembalikan array,bahkan jika hanya ada 1 user
   const foundUser = response.data;
@@ -40,37 +35,22 @@ export const loginUser = async (data: UserLogin) => {
 
 //ambil user by Id
 export const getUserById = async (id: string) => {
-  try {
-    const response = await axios.get(`${API_URL}${API_Users}/${id}`);
-    console.log("Data User: ", response);
-    return response.data;
-  } catch (error) {
-    console.log(`Gagal mengambil data user ID: ${id}`, error);
-    throw error;
-  }
+  const response = await apiClient.get(`${API_Users}/${id}`);
+  console.log("Data User: ", response);
+  return response.data;
 };
 
 //update user
 export const updateUser = async (id: string, data: User) => {
-  try {
-    const response = await axios.put(`${API_URL}${API_Users}/${data.id}`, data);
-    console.log(`User ID: ${id} berhasil diupdate`);
-    console.log("Server response: ", response);
-    return response.data;
-  } catch (error) {
-    console.log(`Gagal update user ID: ${id}`, error);
-    throw error;
-  }
+  const response = await apiClient.put(`${API_Users}/${id}`, data);
+  console.log(`User ID: ${id} berhasil diupdate`);
+  console.log("Server response: ", response);
+  return response.data;
 };
 
 export const deleteUser = async (id: string) => {
-  try {
-    const response = await axios.delete(`${API_URL}${API_Users}/${id}`);
-    console.log(`User ID: ${id} berhasil dihapus: `);
-    console.log("Server response: ", response);
-    return response.data;
-  } catch (error) {
-    console.log(`Gagal menghapus user ID: ${id}`, error);
-    throw error;
-  }
+  const response = await apiClient.delete(`${API_Users}/${id}`);
+  console.log(`User ID: ${id} berhasil dihapus: `);
+  console.log("Server response: ", response);
+  return response.data;
 };

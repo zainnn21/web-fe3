@@ -4,89 +4,43 @@ import NavigationButton from "../Elements/MyProfile/NavigationButton";
 import MyProfileForm from "../Elements/MyProfile/myprofileform";
 import Button from "../Elements/Button";
 import CountryCode from "../Elements/MyProfile/countrycode";
-import { useEffect, useState } from "react";
-import {
-  updateUser,
-  getUserById,
-  deleteUser,
-} from "../../services/api/auth.service";
-import type { User } from "../../services/types/auth";
+import { useEffect } from "react";
+import { useProfileStore } from "../../stores/useProfileStore";
 
 const Profile = () => {
-  const [profile, setProfile] = useState<User | undefined>(undefined);
+  const { profile, fetchProfile, updateProfile, deleteProfile, setProfile } =
+    useProfileStore();
   const localSorageId = localStorage.getItem("user");
   const id = localSorageId ? JSON.parse(localSorageId).id : "";
 
   useEffect(() => {
     //jika user belum login
-    if(localStorage.getItem("isLogin") === null) window.location.href = "/";
-    const getInitialState = async () => {
-      if (!id) {
-        console.log("ID Tidak Ditemukan");
-        return;
-      }
-      try {
-        const response = await getUserById(id);
-        setProfile(response);
-      } catch (error) {
-        console.log(`Gagal mengambil data user ID: ${id}`, error);
-        throw error;
-      }
-    };
-    getInitialState();
-  }, [id]);
+    if (localStorage.getItem("isLogin") === null) window.location.href = "/";
+    if (!id) {
+      console.log("ID Tidak Ditemukan");
+      return;
+    }
 
-  const handleFieldChange = (name: string, value: string) => {
-    setProfile((prevProfile) => {
-      if (!prevProfile) return;
-      return {
-        ...prevProfile,
-        [name]: value,
-      };
-    });
-  };
+    fetchProfile(id);
+    console.log("ID User:", id);
+  }, [fetchProfile, id]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    handleFieldChange(event.target.name, event.target.value);
+    setProfile(event.target.name, event.target.value);
 
   const handleCountryCodeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
-  ) => handleFieldChange("countryCode", event.target.value);
+  ) => setProfile("countryCode", event.target.value);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!profile) return;
-
-    try {
-      if (profile.phone && isNaN(profile.phone)) {
-        alert("No Hp hanya bisa diisi dengan angka");
-        return;
-      }
-      updateUser(id, profile);
-      localStorage.setItem("user", JSON.stringify(profile));
-      alert("Data berhasil diubah");
-    } catch (error) {
-      console.log(error);
-      alert("Terjadi kesalahan");
-    }
+    updateProfile(id);
   };
 
   const handleDeleteAccount = () => {
     if (profile) {
-      try {
-        if (!confirm("Apakah anda yakin ingin menghapus akun?")) return;
-        console.log(id);
-        deleteUser(id);
-        localStorage.removeItem("user");
-        localStorage.removeItem("isLogin");
-        localStorage.removeItem("token");
-        alert("Akun berhasil dihapus");
-        if (window.location.pathname === "/my-profile")
-          window.location.href = "/";
-      } catch (error) {
-        console.log(error);
-        alert("Terjadi kesalahan");
-      }
+      deleteProfile(id);
     }
   };
 

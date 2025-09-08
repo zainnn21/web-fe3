@@ -39,8 +39,7 @@ export const useAdminStore = create<AdminState>((set) => ({
     try {
       // Implementasi logika untuk menambahkan produk baru
       const response = await addProduct(data);
-      console.log("Data Product: ", response);
-      return response.data;
+      set((state) => ({ products: [...state.products, response] }));
     } catch (error) {
       console.log("Gagal menambahkan data product", error);
       set({ error: "Gagal menambahkan data product" });
@@ -50,8 +49,11 @@ export const useAdminStore = create<AdminState>((set) => ({
     try {
       // Implementasi logika untuk memperbarui produk yang ada
       const response = await updateProduct(id, data);
-      console.log("Data Product: ", response);
-      return response.data;
+      set((state) => ({
+        products: state.products.map((product) =>
+          product.id === id ? response : product
+        ),
+      }));
     } catch (error) {
       console.log("Gagal memperbarui data product", error);
       set({ error: "Gagal memperbarui data product" });
@@ -60,9 +62,10 @@ export const useAdminStore = create<AdminState>((set) => ({
   deleteExistingProduct: async (id: number) => {
     try {
       // Implementasi logika untuk menghapus produk
-      const response = await deleteProduct(id);
-      console.log("Data Product: ", response);
-      return response.data;
+      await deleteProduct(id);
+      set((state) => ({
+        products: state.products.filter((product) => product.id !== id),
+      }));
     } catch (error) {
       console.log("Gagal menghapus data product", error);
       set({ error: "Gagal menghapus data product" });

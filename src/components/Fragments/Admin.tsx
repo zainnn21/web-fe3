@@ -10,6 +10,39 @@ const Admin = () => {
     window.location.href = "/";
   }
 
+  const initialState = {
+    texttitle: "",
+    price: "",
+    ptitle: "",
+    category: "",
+    source: "",
+    duration: "",
+    profilename: "",
+    job: "",
+    srcprofile: "",
+    jobspan: "",
+  };
+  const [formData, setFormData] = useState(initialState);
+  const [userName, setUserName] = useState("");
+  const [edit, setEdit] = useState<number | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLElement>) => {
+    const target = e.target as
+      | HTMLInputElement
+      | HTMLSelectElement
+      | HTMLTextAreaElement;
+    const { name, value } = target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const resetForm = () => {
+    setFormData(initialState);
+    setEdit(null);
+  };
+
   const {
     addNewProduct,
     fetchProductsByUserId,
@@ -17,19 +50,6 @@ const Admin = () => {
     updateExistingProduct,
     products: courses,
   } = useAdminStore();
-
-  const [userName, setUserName] = useState("");
-  const [texttitle, settexttitle] = useState("");
-  const [price, setPrice] = useState("");
-  const [ptitle, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [source, setImage] = useState("");
-  const [duration, setDuration] = useState("");
-  const [profilename, setcreator] = useState("");
-  const [job, setcreatorJob] = useState("");
-  const [srcprofile, setcreatorPhoto] = useState("");
-  const [jobspan, setcreatorJobPlace] = useState("");
-  const [edit, setEdit] = useState<number | null>(null);
 
   //mengambil product dari api
   useEffect(() => {
@@ -41,31 +61,21 @@ const Admin = () => {
     if (userId) {
       fetchProductsByUserId(userId);
     }
+    
     setUserName(userName);
   }, [fetchProductsByUserId]);
 
-  //menyimpan data course
+  //menyimpan data product dan edit data product
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const userId = JSON.parse(localStorage.getItem("user") || "{}").id;
 
-    if (
-      !texttitle ||
-      !price ||
-      !ptitle ||
-      !category ||
-      !source ||
-      !duration ||
-      !profilename ||
-      !job ||
-      !srcprofile ||
-      !jobspan
-    ) {
+    if (Object.values(formData).some((value) => value === "")) {
       alert("Semua field harus diisi.");
       return;
     }
 
-    if (isNaN(Number(price))) {
+    if (isNaN(Number(formData.price))) {
       alert("Harga harus berupa angka.");
       return;
     }
@@ -79,78 +89,49 @@ const Admin = () => {
     if (edit) {
       const updatedCourse: Product = {
         id: edit,
-        texttitle,
-        ptitle,
-        category,
-        source,
-        duration,
-        price,
-        profilename,
-        job,
-        srcprofile,
-        jobspan,
+        ...formData,
         updatedAt: new Date(),
       };
+
       updateExistingProduct(edit, updatedCourse);
-      console.log(updatedCourse);
       alert("Course berhasil diubah.");
-      setEdit(null);
     } else {
       const newCourse: Product = {
         id: newId,
-        texttitle,
-        ptitle,
-        category,
-        source,
-        duration,
-        price,
-        profilename,
-        job,
-        srcprofile,
-        jobspan,
+        ...formData,
         creatorId: userId,
         ratingImages: 0,
         reviewcount: 0,
       };
       addNewProduct(newCourse);
       alert("Course berhasil ditambahkan.");
-      setEdit(null);
     }
 
     //Reset form
-    settexttitle("");
-    setPrice("");
-    setDescription("");
-    setCategory("");
-    setImage("");
-    setDuration("");
-    setcreator("");
-    setcreatorJob("");
-    setcreatorPhoto("");
-    setcreatorJobPlace("");
-    fetchProductsByUserId(userId);
+    resetForm();
   };
 
   const handleDelete = (id: number) => {
     if (confirm("Apakah Anda yakin ingin menghapus course ini?")) {
       deleteExistingProduct(id);
       alert("Course berhasil dihapus.");
-      window.location.reload();
     }
   };
 
   const handleEdit = (course: Product) => {
     setEdit(course.id);
-    settexttitle(course.texttitle);
-    setPrice(course.price.toString());
-    setDescription(course.ptitle);
-    setCategory(course.category);
-    setImage(course.source);
-    setDuration(course.duration);
-    setcreator(course.profilename);
-    setcreatorJob(course.job);
-    setcreatorPhoto(course.srcprofile);
-    setcreatorJobPlace(course.jobspan);
+    setFormData({
+      texttitle: course.texttitle,
+      price: course.price,
+      ptitle: course.ptitle,
+      category: course.category,
+      source: course.source,
+      duration: course.duration,
+      profilename: course.profilename,
+      job: course.job,
+      srcprofile: course.srcprofile,
+      jobspan: course.jobspan,
+    });
   };
 
   return (
@@ -195,19 +176,19 @@ const Admin = () => {
                   label="Nama Course"
                   type="text"
                   placeholder="Fullstack Developer"
-                  name="namaCourse"
+                  name="texttitle"
                   variantLabel="text-gray-700"
-                  value={texttitle}
-                  onChange={(e) => settexttitle(e.target.value)}
+                  value={formData.texttitle}
+                  onChange={handleChange}
                 />
                 <Input
                   label="Harga (IDR)"
                   type="number"
                   placeholder="100000"
-                  name="harga"
+                  name="price"
                   variantLabel="text-gray-700"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  value={formData.price}
+                  onChange={handleChange}
                 />
                 <Input
                   label="Pembuat Course"
@@ -215,35 +196,35 @@ const Admin = () => {
                   placeholder="Alexander Nugraha"
                   name="profilename"
                   variantLabel="text-gray-700"
-                  value={profilename}
-                  onChange={(e) => setcreator(e.target.value)}
+                  value={formData.profilename}
+                  onChange={handleChange}
                 />
                 <Input
                   label="Pekerjaan"
                   type="text"
                   placeholder="Fullstack Developer"
-                  name="pekerjaan"
+                  name="job"
                   variantLabel="text-gray-700"
-                  value={job}
-                  onChange={(e) => setcreatorJob(e.target.value)}
+                  value={formData.job}
+                  onChange={handleChange}
                 />
                 <Input
                   label="Tempat Kerja"
                   type="text"
                   placeholder="Google"
-                  name="tempatKerja"
+                  name="jobspan"
                   variantLabel="text-gray-700"
-                  value={jobspan}
-                  onChange={(e) => setcreatorJobPlace(e.target.value)}
+                  value={formData.jobspan}
+                  onChange={handleChange}
                 />
                 <Input
                   label="URL Photo"
                   type="url"
                   placeholder="https://.../source.png"
-                  name="Profile Picture"
+                  name="srcprofile"
                   variantLabel="text-gray-700"
-                  onChange={(e) => setcreatorPhoto(e.target.value)}
-                  value={srcprofile}
+                  onChange={handleChange}
+                  value={formData.srcprofile}
                 />
                 <div>
                   <Label
@@ -253,11 +234,11 @@ const Admin = () => {
                     Kategori
                   </Label>
                   <select
-                    name="kategori"
+                    name="category"
                     id="kategori"
                     className="block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 p-3 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                    onChange={(e) => setCategory(e.target.value)}
-                    value={category}
+                    onChange={handleChange}
+                    value={formData.category}
                   >
                     <option>Pilih Kategori</option>
                     <option value="Pemasaran">Pemasaran</option>
@@ -275,19 +256,19 @@ const Admin = () => {
                   label="URL Gambar"
                   type="url"
                   placeholder="https://.../source.png"
-                  name="gambar"
+                  name="source"
                   variantLabel="text-gray-700"
-                  onChange={(e) => setImage(e.target.value)}
-                  value={source}
+                  onChange={handleChange}
+                  value={formData.source}
                 />
                 <Input
                   label="Durasi"
                   type="text"
                   placeholder="Contoh: 10 jam 15 menit"
-                  name="durasi"
+                  name="duration"
                   variantLabel="text-gray-700"
-                  onChange={(e) => setDuration(e.target.value)}
-                  value={duration}
+                  onChange={handleChange}
+                  value={formData.duration}
                 />
               </div>
               <div className="col-span-full">
@@ -298,13 +279,13 @@ const Admin = () => {
                   Deskripsi
                 </Label>
                 <textarea
-                  name="deskripsi"
+                  name="ptitle"
                   id="deskripsi"
                   rows={4}
                   placeholder="Jelaskan mengenai course ini secara detail..."
                   className="mt-1 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-                  onChange={(e) => setDescription(e.target.value)}
-                  value={ptitle}
+                  onChange={handleChange}
+                  value={formData.ptitle}
                 />
               </div>
               <div className="flex justify-end">

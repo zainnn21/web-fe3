@@ -2,92 +2,64 @@ import { useEffect, useState } from "react";
 import Input from "../Elements/Input/Index";
 import Label from "../Elements/Input/Label";
 import Card from "../Elements/Card";
+import { useAdminStore } from "../../stores/useAdminStore";
+import type { Product } from "../../services/types/product";
 
 const Admin = () => {
-  type typeCourse = {
-    id: number;
-    nameCourse: string;
-    description: string;
-    category: string;
-    image: string;
-    duration: string;
-    price: number;
-    creator: string;
-    creatorJob: string;
-    creatorPhoto: string;
-    creatorJobPlace: string;
-  };
+  if (!localStorage.getItem("isLogin")) {
+    window.location.href = "/";
+  }
+
+  const {
+    addNewProduct,
+    fetchProductsByUserId,
+    deleteExistingProduct,
+    updateExistingProduct,
+    products: courses,
+  } = useAdminStore();
 
   const [userName, setUserName] = useState("");
-  const [nameCourse, setNameCourse] = useState("");
+  const [texttitle, settexttitle] = useState("");
   const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
+  const [ptitle, setDescription] = useState("");
   const [category, setCategory] = useState("");
-  const [image, setImage] = useState("");
+  const [source, setImage] = useState("");
   const [duration, setDuration] = useState("");
-  const [creator, setcreator] = useState("");
-  const [creatorJob, setcreatorJob] = useState("");
-  const [creatorPhoto, setcreatorPhoto] = useState("");
-  const [creatorJobPlace, setcreatorJobPlace] = useState("");
+  const [profilename, setcreator] = useState("");
+  const [job, setcreatorJob] = useState("");
+  const [srcprofile, setcreatorPhoto] = useState("");
+  const [jobspan, setcreatorJobPlace] = useState("");
   const [edit, setEdit] = useState<number | null>(null);
 
-  //mengambil data course dari local storage
-  const [courses, setCourses] = useState(() => {
-    const storedCourses = localStorage.getItem("courses");
-    return storedCourses ? JSON.parse(storedCourses) : [];
-  });
-
-  //mengambil data user dari local storage
+  //mengambil product dari api
   useEffect(() => {
-    try {
-      const profileDataString = localStorage.getItem("profileData");
-      if (profileDataString) {
-        const profileData = JSON.parse(profileDataString);
-        setUserName(profileData.namaLengkap || "");
-      }
-    } catch (error) {
-      console.error("Failed to parse profile data from localStorage", error);
-      setUserName("");
-    }
-  }, []);
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const userId = user.id;
+    const userName = user.name;
+    console.log("Data User: ", user);
 
-  //menyimpan data course ke local storage
-  useEffect(() => {
-    localStorage.setItem("courses", JSON.stringify(courses));
-  }, [courses]);
-
-  const formatPrice = (price: number) => {
-    //Format million
-    if (price >= 1000000) {
-      const num = (price / 1000000).toFixed(1);
-      if (num.endsWith(".0")) {
-        return `Rp ${Math.floor(price / 1000000)}M`;
-      }
-      return `Rp ${num}M`;
+    if (userId) {
+      fetchProductsByUserId(userId);
     }
-    //Format thousand
-    if (price >= 1000) {
-      return `Rp ${Math.floor(price / 1000)}K`;
-    }
-
-    return `Rp` + price;
-  };
+    setUserName(userName);
+  }, [fetchProductsByUserId]);
 
   //menyimpan data course
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const userId = JSON.parse(localStorage.getItem("user") || "{}").id;
 
     if (
-      !nameCourse ||
+      !texttitle ||
       !price ||
-      !description ||
+      !ptitle ||
       !category ||
-      !image ||
+      !source ||
       !duration ||
-      !creator ||
-      !creatorJob ||
-      !creatorPhoto ||
-      !creatorJobPlace
+      !profilename ||
+      !job ||
+      !srcprofile ||
+      !jobspan
     ) {
       alert("Semua field harus diisi.");
       return;
@@ -101,51 +73,52 @@ const Admin = () => {
     // Generate ID
     const newId =
       courses.length > 0
-        ? Math.max(...courses.map((c: typeCourse) => c.id)) + 1
+        ? Math.max(...courses.map((c: Product) => c.id)) + 1
         : 1;
 
     if (edit) {
-      setCourses(
-        courses.map((course: typeCourse) =>
-          course.id === edit
-            ? {
-                ...course,
-                nameCourse,
-                description,
-                category,
-                image,
-                duration,
-                price: Number(price),
-                creator,
-                creatorJob,
-                creatorPhoto,
-                creatorJobPlace,
-              }
-            : course
-        )
-      );
-      setEdit(null);
-      alert("Course berhasil diubah.");
-    } else {
-      const newCourse: typeCourse = {
-        id: newId,
-        nameCourse,
-        description,
+      const updatedCourse: Product = {
+        id: edit,
+        texttitle,
+        ptitle,
         category,
-        image,
+        source,
         duration,
-        price: Number(price),
-        creator,
-        creatorJob,
-        creatorPhoto,
-        creatorJobPlace,
+        price,
+        profilename,
+        job,
+        srcprofile,
+        jobspan,
+        updatedAt: new Date(),
       };
-      setCourses([...courses, newCourse]);
+      updateExistingProduct(edit, updatedCourse);
+      console.log(updatedCourse);
+      alert("Course berhasil diubah.");
+      setEdit(null);
+    } else {
+      const newCourse: Product = {
+        id: newId,
+        texttitle,
+        ptitle,
+        category,
+        source,
+        duration,
+        price,
+        profilename,
+        job,
+        srcprofile,
+        jobspan,
+        creatorId: userId,
+        ratingImages: 0,
+        reviewcount: 0,
+      };
+      addNewProduct(newCourse);
       alert("Course berhasil ditambahkan.");
+      setEdit(null);
     }
 
-    // Reset form
-    setNameCourse("");
+    //Reset form
+    settexttitle("");
     setPrice("");
     setDescription("");
     setCategory("");
@@ -155,27 +128,29 @@ const Admin = () => {
     setcreatorJob("");
     setcreatorPhoto("");
     setcreatorJobPlace("");
+    fetchProductsByUserId(userId);
   };
 
   const handleDelete = (id: number) => {
     if (confirm("Apakah Anda yakin ingin menghapus course ini?")) {
-      setCourses(courses.filter((course: typeCourse) => course.id !== id));
+      deleteExistingProduct(id);
       alert("Course berhasil dihapus.");
+      window.location.reload();
     }
   };
 
-  const handleEdit = (course: typeCourse) => {
+  const handleEdit = (course: Product) => {
     setEdit(course.id);
-    setNameCourse(course.nameCourse);
+    settexttitle(course.texttitle);
     setPrice(course.price.toString());
-    setDescription(course.description);
+    setDescription(course.ptitle);
     setCategory(course.category);
-    setImage(course.image);
+    setImage(course.source);
     setDuration(course.duration);
-    setcreator(course.creator);
-    setcreatorJob(course.creatorJob);
-    setcreatorPhoto(course.creatorPhoto);
-    setcreatorJobPlace(course.creatorJobPlace);
+    setcreator(course.profilename);
+    setcreatorJob(course.job);
+    setcreatorPhoto(course.srcprofile);
+    setcreatorJobPlace(course.jobspan);
   };
 
   return (
@@ -222,8 +197,8 @@ const Admin = () => {
                   placeholder="Fullstack Developer"
                   name="namaCourse"
                   variantLabel="text-gray-700"
-                  value={nameCourse}
-                  onChange={(e) => setNameCourse(e.target.value)}
+                  value={texttitle}
+                  onChange={(e) => settexttitle(e.target.value)}
                 />
                 <Input
                   label="Harga (IDR)"
@@ -238,9 +213,9 @@ const Admin = () => {
                   label="Pembuat Course"
                   type="text"
                   placeholder="Alexander Nugraha"
-                  name="creator"
+                  name="profilename"
                   variantLabel="text-gray-700"
-                  value={creator}
+                  value={profilename}
                   onChange={(e) => setcreator(e.target.value)}
                 />
                 <Input
@@ -249,7 +224,7 @@ const Admin = () => {
                   placeholder="Fullstack Developer"
                   name="pekerjaan"
                   variantLabel="text-gray-700"
-                  value={creatorJob}
+                  value={job}
                   onChange={(e) => setcreatorJob(e.target.value)}
                 />
                 <Input
@@ -258,17 +233,17 @@ const Admin = () => {
                   placeholder="Google"
                   name="tempatKerja"
                   variantLabel="text-gray-700"
-                  value={creatorJobPlace}
+                  value={jobspan}
                   onChange={(e) => setcreatorJobPlace(e.target.value)}
                 />
                 <Input
                   label="URL Photo"
                   type="url"
-                  placeholder="https://.../image.png"
+                  placeholder="https://.../source.png"
                   name="Profile Picture"
                   variantLabel="text-gray-700"
                   onChange={(e) => setcreatorPhoto(e.target.value)}
-                  value={creatorPhoto}
+                  value={srcprofile}
                 />
                 <div>
                   <Label
@@ -299,11 +274,11 @@ const Admin = () => {
                 <Input
                   label="URL Gambar"
                   type="url"
-                  placeholder="https://.../image.png"
+                  placeholder="https://.../source.png"
                   name="gambar"
                   variantLabel="text-gray-700"
                   onChange={(e) => setImage(e.target.value)}
-                  value={image}
+                  value={source}
                 />
                 <Input
                   label="Durasi"
@@ -329,7 +304,7 @@ const Admin = () => {
                   placeholder="Jelaskan mengenai course ini secara detail..."
                   className="mt-1 block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
                   onChange={(e) => setDescription(e.target.value)}
-                  value={description}
+                  value={ptitle}
                 />
               </div>
               <div className="flex justify-end">
@@ -360,20 +335,25 @@ const Admin = () => {
         </p>
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
           {courses.length > 0 ? (
-            courses.map((courses: typeCourse) => (
+            courses.map((courses: Product) => (
               <div
                 key={courses.id}
                 className="flex flex-col gap-4  p-4 hover:bg-gray-100 hover:rounded-lg transition-colors duration-300 ease-in-out items-center rounded-lg bg-gray-50"
               >
                 <Card
-                  source={courses.image}
-                  texttitle={courses.nameCourse}
-                  price={formatPrice(courses.price)}
-                  ptitle={courses.description}
-                  srcprofile={courses.creatorPhoto}
-                  profilename={courses.creator}
-                  job={courses.creatorJob}
-                  jobspan={courses.creatorJobPlace}
+                  source={courses.source}
+                  texttitle={courses.texttitle}
+                  price={courses.price}
+                  ptitle={courses.ptitle}
+                  srcprofile={courses.srcprofile}
+                  profilename={courses.profilename}
+                  job={courses.job}
+                  jobspan={courses.jobspan}
+                  id={courses.id}
+                  duration={courses.duration}
+                  category={courses.category}
+                  reviewcount={courses.reviewcount}
+                  ratingImages={courses.ratingImages}
                 />
                 <div className="flex items-center justify-end gap-4">
                   <button

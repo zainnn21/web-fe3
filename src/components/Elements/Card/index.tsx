@@ -3,20 +3,7 @@ import CardTitle from "./Title";
 import ParagraphCard from "./paragraph";
 import Profile from "./ProfileCard";
 import Stars from "./stars";
-
-type CardProps = {
-  source: string;
-  texttitle: string;
-  ptitle: string;
-  srcprofile: string;
-  profilename: string;
-  job: string;
-  jobspan: string;
-  ratingImages?: number;
-  price: string;
-  className?: string;
-  reviewcount?: number;
-};
+import type {Product} from "../../../services/types/product";
 
 const formatPrice = (price: number) => {
   //Format million
@@ -47,7 +34,7 @@ const Card = ({
   price,
   className = "",
   reviewcount,
-}: CardProps) => {
+}: Product) => {
   return (
     <div
       className={`md:w-96 rounded-[10px] bg-white border md:p-5 p-4 flex flex-col md:gap-4 gap-2 md:justify-between border-[#3A35411F] ${className} hover:shadow-lg cursor-pointer hover:scale-105 transition-all duration-300 ease-in-out `}

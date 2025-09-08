@@ -1,12 +1,12 @@
 import TitleCollectionVideo from "../Elements/Card/titlecollectionvideo";
 import Filter from "../Elements/Card/filter";
 import Card from "../Elements/Card";
-import Data from "../../data/cardClass";
 import Pagination from "../Elements/Card/Pagination";
 import ProductControls from "../Elements/Card/sortandsearchproduct";
 import { useEffect, useState } from "react";
 import { useProductFilter } from "../../hooks/useProductFilter";
 import { useSearchAndSort } from "../../hooks/useSearchAndSort";
+import { getProduct } from "../../services/api/product.service";
 
 const CATEGORY_OPTIONS = [
   { value: "Pemasaran", label: "Pemasaran" },
@@ -28,6 +28,7 @@ const DURATION_OPTIONS = [
   { value: "LebihDari8jam", label: "Lebih Dari 8 Jam" },
 ];
 
+const Data = await getProduct();
 const AllProduct = () => {
   // 1. Filter berdasarkan checkbox
   const {
@@ -61,7 +62,7 @@ const AllProduct = () => {
     setCurrentPage(1);
   }, [finalData]);
 
-  // Logika Paginasi
+  // Logic Paginasi
   const itemsPerPage = 6;
   const totalPages = Math.ceil(finalData.length / itemsPerPage);
   const currentItems = finalData.slice(

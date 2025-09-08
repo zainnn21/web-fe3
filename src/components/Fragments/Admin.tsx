@@ -12,7 +12,7 @@ const Admin = () => {
 
   const initialState = {
     texttitle: "",
-    price: "",
+    price: 0,
     ptitle: "",
     category: "",
     source: "",
@@ -61,7 +61,7 @@ const Admin = () => {
     if (userId) {
       fetchProductsByUserId(userId);
     }
-    
+
     setUserName(userName);
   }, [fetchProductsByUserId]);
 
@@ -80,6 +80,10 @@ const Admin = () => {
       return;
     }
 
+    if (formData.price === 0) {
+      confirm("Apakah anda yakin harga course 0 (gratis)?");
+    }
+    
     // Generate ID
     const newId =
       courses.length > 0
@@ -90,15 +94,16 @@ const Admin = () => {
       const updatedCourse: Product = {
         id: edit,
         ...formData,
+        price: Number(formData.price),
         updatedAt: new Date(),
       };
-
       updateExistingProduct(edit, updatedCourse);
       alert("Course berhasil diubah.");
     } else {
       const newCourse: Product = {
         id: newId,
         ...formData,
+        price: Number(formData.price),
         creatorId: userId,
         ratingImages: 0,
         reviewcount: 0,
@@ -106,7 +111,6 @@ const Admin = () => {
       addNewProduct(newCourse);
       alert("Course berhasil ditambahkan.");
     }
-
     //Reset form
     resetForm();
   };

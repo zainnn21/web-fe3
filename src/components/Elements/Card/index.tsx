@@ -3,7 +3,7 @@ import CardTitle from "./Title";
 import ParagraphCard from "./paragraph";
 import Profile from "./ProfileCard";
 import Stars from "./stars";
-import type {Product} from "../../../services/types/product";
+import type { Product } from "../../../services/types/product";
 
 const formatPrice = (price: number) => {
   //Format million
@@ -18,7 +18,12 @@ const formatPrice = (price: number) => {
   if (price >= 1000) {
     return `Rp ${Math.floor(price / 1000)}K`;
   }
+  //Free
+  if (price === 0) {
+    return `Gratis`;
+  }
 
+  //Default
   return `Rp` + price;
 };
 

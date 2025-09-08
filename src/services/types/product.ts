@@ -1,4 +1,4 @@
-export interface Product  {
+export interface Product {
   id: number;
   source: string;
   texttitle: string;
@@ -8,14 +8,14 @@ export interface Product  {
   job: string;
   jobspan: string;
   ratingImages?: number;
-  price: string;
+  price: number;
   className?: string;
   reviewcount?: number;
   duration: string;
   category: string;
   creatorId?: string;
   updatedAt?: Date;
-};
+}
 
 export interface limitOption {
   limit?: number;

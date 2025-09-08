@@ -41,11 +41,18 @@ type FilterState = {
  * @param {string} price - String harga yang akan dikonversi.
  * @returns {number} Nilai numerik dari harga.
  */
-const getPriceValue = (price: string): number => {
-  if (price.toLowerCase().includes("gratis")) return 0;
-  const regex = /(\d+)K/;
-  const match = regex.exec(price);
-  return match ? parseInt(match[1]) * 1000 : 0;
+const getPriceValue = (price: string | number): number => {
+  if (typeof price === "number") {
+    console.log(price);
+    return price;
+  }
+  if (typeof price === "string") {
+    if (price.toLocaleLowerCase().includes("gratis")) return 0;
+    const regex = /(\d+)K/;
+    const match = regex.exec(price);
+    return match ? parseInt(match[1]) * 1000 : 0;
+  }
+  return 0;
 };
 
 /**
